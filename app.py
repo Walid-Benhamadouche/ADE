@@ -5,7 +5,7 @@ from tkinter import *
 import Canvases.HomeCanvas as hc
 import Canvases.OutlierCanvas as oc
 import Canvases.AnalyseCanvas as ac
-import Canvases.Incubation_Canvas as ic
+import Canvases.IncubationCanvas as ic
 import Canvases.ClassificationCanvas as cc
 
 #colors
@@ -67,17 +67,17 @@ incubation_canvas = ic.createOutlier(root)
 analyse_canvas = ac.createAnalyse(root)
 classification_vancas = cc.createOutlier(root)
 
-#next_home = tk.Button(data_pre_canvas,
-#                 text="Next Step",
-#                 width=15,
-#                 height=2,
-#                 bg=menu_color,
-#                 fg='grey',
-#                 highlightthickness=0,
-#                 relief='flat',
-#                 font=("Helvetica", 14))
-#next_home.pack()
-#next_home.bind('<ButtonRelease-1>', go_next)
+next_home = tk.Button(data_pre_canvas,
+                 text="Next Step",
+                 width=15,
+                 height=2,
+                 bg=menu_color,
+                 fg='white',
+                 highlightthickness=0,
+                 relief='flat',
+                 font=("Helvetica", 12))
+next_home.place(relx=0.85, rely=0.9)
+next_home.bind('<ButtonRelease-1>', go_next)
 
 #side menu items
 
