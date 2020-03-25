@@ -11,6 +11,7 @@ from matplotlib.backends.backend_tkagg import (
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+import matplotlib.ticker as mtick
 
 def createHome(parent):
     #functions
@@ -23,6 +24,14 @@ def createHome(parent):
         dateparse = lambda x: pd.datetime.strptime(x, '%d/%m/%Y')
         Data_base_csv = pd.read_csv(parent.filename,parse_dates=['date_DCL'],date_parser=dateparse)
         dates = Data_base_csv.groupby(['date_DCL']).size()
+        Threshold = pd.read_csv(parent.filename,usecols = ["threshold"])
+        Threshold = Threshold.iloc[0].values.tolist()
+        Threshold = Threshold[0].split("/",1)
+        number_of_cases = Threshold[0]
+        per_person = Threshold[1]
+        print(number_of_cases)
+        print(per_person)
+        Threshold_percent = (int(Threshold[0])/int(Threshold[1]))*100
         year = dates.keys()[0].year
         idx = pd.date_range('01-01-' + str(year), '12-31-' + str(year))
         dates = dates.reindex(idx, fill_value=0)
@@ -37,39 +46,47 @@ def createHome(parent):
             counter+=value
             day+=1
         values_per_week.append(counter)
+
+        percentages=[]
+        for x in values_per_week:
+            temp = (x/5000)*100
+            percentages.append(temp)
+        # reploting
+        x = np.linspace(1, len(values_per_week), len(values_per_week))
+
         fig = Figure()
-        np.random.seed(19680801)
-        y_pos = np.arange(len(values_per_week))
-        performance = 0 * np.random.rand(len(values_per_week))
-        error = np.random.rand(len(values_per_week))
+        fig.patch.set_facecolor('#fec5e5')
+        
+        #thresholdlist = [Threshold.iloc[0].values for i in range(53)]
+        #print(thresholdlist)
+
+        figu = fig.add_subplot()
+        figu.stem(x,percentages, 'b', use_line_collection=True, markerfmt='bo', label='data')
+        #to display as %
+        figu.yaxis.set_major_formatter(mtick.PercentFormatter(1))
+        figu.set_title('number of cases per week')
+        figu.set_facecolor('#fec5e5')
+        figu.plot(x, [Threshold_percent for i in range(53)], label='treshold')
+        figu.legend()
 
         plot.get_tk_widget().forget()
-
-        fig.add_subplot().bar(y_pos, values_per_week, xerr=error, align='edge')
-        fig.add_subplot().set_xticks(y_pos)
-        fig.add_subplot().set_xticklabels(weeks)
-        fig.add_subplot().set_title('number of cases per week')
-        fig.patch.set_facecolor('#fec5e5')
-        fig.add_subplot().set_facecolor('#fec5e5')
-        fig.tight_layout()
         plot = FigureCanvasTkAgg(fig, master=home)
         plot.draw()
         plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
 
-    def Load_threshold_csv(event):
-        global Treshold_csv
-        parent.filename = filedialog.askopenfilename(initialdir = "/",
-                                                     title = "Select file",
-                                                     filetypes = (("CSV files","*.csv"),
-                                                     ("all files","*.*")))
-        Treshold_csv = pd.read_csv(parent.filename)
+    #def Load_threshold_csv(event):
+     #   global Treshold_csv
+      #  parent.filename = filedialog.askopenfilename(initialdir = "/",
+       #                                              title = "Select file",
+        #                                             filetypes = (("CSV files","*.csv"),
+         #                                            ("all files","*.*")))
+        #Treshold_csv = pd.read_csv(parent.filename)
 
     #colors
     canvas_bg_color="#fec5e5"
     button_bg_color="#3258EF"
     #variables that needs declaration
     values_per_week = []
-    weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53]
     Data_base_csv=''
     Treshold_csv=''
 
@@ -86,18 +103,12 @@ def createHome(parent):
 
     #adding plot
     fig = Figure()
-    np.random.seed(19680801)
-    y_pos = np.arange(len(values_per_week))
-    performance = 0 * np.random.rand(len(values_per_week))
-    error = np.random.rand(len(values_per_week))
-
-    fig.add_subplot().bar(y_pos, values_per_week, xerr=error, align='center')
-    fig.add_subplot().set_xticks(y_pos)
-    fig.add_subplot().set_xticklabels(weeks)
-    fig.add_subplot().set_title('number of cases per week')
     fig.patch.set_facecolor('#fec5e5')
-    fig.add_subplot().set_facecolor('#fec5e5')
-    fig.tight_layout()
+
+    figu = fig.add_subplot()
+    figu.stem([0], [0], use_line_collection=True)
+    figu.set_title('number of cases per week')
+    figu.set_facecolor('#fec5e5')
 
     plot = FigureCanvasTkAgg(fig, master=home)  # A tk.DrawingArea.
     plot.draw()
@@ -124,20 +135,20 @@ def createHome(parent):
                  highlightthickness=0,
                  relief='flat',
                  font=("Helvetica", 12))
-    Load_db.place(relx=0.4, y = 70, anchor=tk.CENTER)
+    Load_db.place(relx=0.5, y = 70, anchor=tk.CENTER)
     Load_db.configure(command=lambda b=values_per_week, plot=plot: Load_db_csv(b, plot))
     #Load_db.bind('<ButtonRelease-1>', Load_db_csv)
 
-    Load_threshold = tk.Button(home,
-                 text="Load Threshold",
-                 width=15,
-                 height=2,
-                 bg=button_bg_color,
-                 fg='white',
-                 highlightthickness=0,
-                 relief='flat',
-                 font=("Helvetica", 12))
-    Load_threshold.place(relx=0.6, y = 70, anchor=tk.CENTER)
-    Load_threshold.bind('<ButtonRelease-1>', Load_threshold_csv)
+    #Load_threshold = tk.Button(home,
+    #             text="Load Threshold",
+    #             width=15,
+    #             height=2,
+    #             bg=button_bg_color,
+    #             fg='white',
+    #             highlightthickness=0,
+    #             relief='flat',
+    #             font=("Helvetica", 12))
+    #Load_threshold.place(relx=0.6, y = 70, anchor=tk.CENTER)
+    #Load_threshold.bind('<ButtonRelease-1>', Load_threshold_csv)
 
     return home
