@@ -13,9 +13,12 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 
+values_per_week = []
+Threshold_percent = []
+percentages = []
 def createHome(parent):
     #functions
-    def Load_db_csv(values_per_week, plot):
+    def Load_db_csv(values_per_week, Threshold_percent, percentages, plot):
         global Data_base_csv
         parent.filename = filedialog.askopenfilename(initialdir = "/",
                                                      title = "Select file",
@@ -31,7 +34,7 @@ def createHome(parent):
         per_person = Threshold[1]
         print(number_of_cases)
         print(per_person)
-        Threshold_percent = (int(Threshold[0])/int(Threshold[1]))*100
+        Threshold_percent.append((int(Threshold[0])/int(Threshold[1]))*100)
         year = dates.keys()[0].year
         idx = pd.date_range('01-01-' + str(year), '12-31-' + str(year))
         dates = dates.reindex(idx, fill_value=0)
@@ -47,7 +50,6 @@ def createHome(parent):
             day+=1
         values_per_week.append(counter)
 
-        percentages=[]
         for x in values_per_week:
             temp = (x/5000)*100
             percentages.append(temp)
@@ -86,7 +88,9 @@ def createHome(parent):
     canvas_bg_color="#fec5e5"
     button_bg_color="#3258EF"
     #variables that needs declaration
-    values_per_week = []
+    global values_per_week
+    global Threshold_percent
+    global percentages
     Data_base_csv=''
     Treshold_csv=''
 
@@ -136,7 +140,7 @@ def createHome(parent):
                  relief='flat',
                  font=("Helvetica", 12))
     Load_db.place(relx=0.5, y = 70, anchor=tk.CENTER)
-    Load_db.configure(command=lambda b=values_per_week, plot=plot: Load_db_csv(b, plot))
+    Load_db.configure(command=lambda b=values_per_week, c=Threshold_percent, d=percentages, plot=plot: Load_db_csv(b, c, d, plot))
     #Load_db.bind('<ButtonRelease-1>', Load_db_csv)
 
     #Load_threshold = tk.Button(home,
