@@ -25,8 +25,12 @@ def on_leave(event):
 
 #on click event
 def go_next(event):
+    global analyse_canvas
+    global in_use
     data_pre_canvas.pack_forget()
-    outliers_canvas.pack(side="right", fill=BOTH, expand=1)
+    in_use = 'Analysing Data'
+    analyse_canvas = ac.createAnalyse(root, hc.values_per_week, hc.Threshold_percent, hc.percentages)
+    analyse_canvas.pack(side="right", fill=BOTH, expand=1)
 
 def switch_canvas(button):
     global in_use
@@ -64,7 +68,8 @@ in_use='Data Presentation'
 data_pre_canvas = hc.createHome(root)
 outliers_canvas = oc.createOutlier(root)
 incubation_canvas = ic.createOutlier(root)
-analyse_canvas = ac.createAnalyse(root)
+print(hc.values_per_week)
+#analyse_canvas = hc.createAnalyse()
 classification_vancas = cc.createOutlier(root)
 
 next_home = tk.Button(data_pre_canvas,

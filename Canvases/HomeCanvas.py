@@ -12,13 +12,17 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
+#import Canvases.AnalyseCanvas as ac
 
 values_per_week = []
 Threshold_percent = []
 percentages = []
+analyse_canvas=''
+fig=''
 def createHome(parent):
     #functions
-    def Load_db_csv(values_per_week, Threshold_percent, percentages, plot):
+    global fig
+    def Load_db_csv(values_per_week, Threshold_percent, percentages, plot, fig):
         global Data_base_csv
         parent.filename = filedialog.askopenfilename(initialdir = "/",
                                                      title = "Select file",
@@ -63,7 +67,8 @@ def createHome(parent):
         #print(thresholdlist)
 
         figu = fig.add_subplot()
-        figu.stem(x,percentages, 'b', use_line_collection=True, markerfmt='bo', label='data')
+        #figu.stem(x,percentages, 'b', use_line_collection=True, markerfmt='bo', label='data')
+        figu.bar(x, percentages)
         #to display as %
         figu.yaxis.set_major_formatter(mtick.PercentFormatter(1))
         figu.set_title('number of cases per week')
@@ -75,6 +80,8 @@ def createHome(parent):
         plot = FigureCanvasTkAgg(fig, master=home)
         plot.draw()
         plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
+        global analyse_canvas
+        #analyse_canvas = ac.createAnalyse(parent, values_per_week, Threshold_percent, percentages)
 
     #def Load_threshold_csv(event):
      #   global Treshold_csv
@@ -110,7 +117,8 @@ def createHome(parent):
     fig.patch.set_facecolor('#fec5e5')
 
     figu = fig.add_subplot()
-    figu.stem([0], [0], use_line_collection=True)
+    #figu.stem([0], [0], use_line_collection=True)
+    figu.bar([0], [0])
     figu.set_title('number of cases per week')
     figu.set_facecolor('#fec5e5')
 
@@ -140,19 +148,5 @@ def createHome(parent):
                  relief='flat',
                  font=("Helvetica", 12))
     Load_db.place(relx=0.5, y = 70, anchor=tk.CENTER)
-    Load_db.configure(command=lambda b=values_per_week, c=Threshold_percent, d=percentages, plot=plot: Load_db_csv(b, c, d, plot))
-    #Load_db.bind('<ButtonRelease-1>', Load_db_csv)
-
-    #Load_threshold = tk.Button(home,
-    #             text="Load Threshold",
-    #             width=15,
-    #             height=2,
-    #             bg=button_bg_color,
-    #             fg='white',
-    #             highlightthickness=0,
-    #             relief='flat',
-    #             font=("Helvetica", 12))
-    #Load_threshold.place(relx=0.6, y = 70, anchor=tk.CENTER)
-    #Load_threshold.bind('<ButtonRelease-1>', Load_threshold_csv)
-
+    Load_db.configure(command=lambda b=values_per_week, c=Threshold_percent, d=percentages,f=fig, plot=plot: Load_db_csv(b, c, d, plot, f))
     return home
