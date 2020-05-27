@@ -14,16 +14,32 @@ from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 #import Canvases.AnalyseCanvas as ac
 
+Sexe = []
+Age = []
+Secteur = []
+Quartier = []
+Commune = []
 values_per_week = []
+values_per_day = []
 Threshold_percent = []
 percentages = []
+incubation_min=''
+incubation_max=''
 analyse_canvas=''
 fig=''
 def createHome(parent):
     #functions
     global fig
     def Load_db_csv(values_per_week, Threshold_percent, percentages, plot, fig):
+        global Sexe
+        global Age
+        global Secteur
+        global Quartier
+        global Commune
         global Data_base_csv
+        global values_per_day
+        global incubation_min
+        global incubation_max
         parent.filename = filedialog.askopenfilename(initialdir = "/",
                                                      title = "Select file",
                                                      filetypes = (("CSV files","*.csv"),
@@ -31,7 +47,14 @@ def createHome(parent):
         dateparse = lambda x: pd.datetime.strptime(x, '%d/%m/%Y')
         Data_base_csv = pd.read_csv(parent.filename,parse_dates=['date_DCL'],date_parser=dateparse)
         dates = Data_base_csv.groupby(['date_DCL']).size()
+        Sexe = pd.read_csv(parent.filename,usecols = ["sexe"])
+        Age = pd.read_csv(parent.filename,usecols = ["age"])
+        Secteur = pd.read_csv(parent.filename,usecols = ["nom_secteur"])
+        Quartier = pd.read_csv(parent.filename,usecols = ["nom_quartier"])
+        Commune = pd.read_csv(parent.filename,usecols = ["nom_commune"])
         Threshold = pd.read_csv(parent.filename,usecols = ["threshold"])
+        incubation_min = pd.read_csv(parent.filename,usecols = ["incubation_min"])
+        incubation_max = pd.read_csv(parent.filename,usecols = ["incubation_max"])
         Threshold = Threshold.iloc[0].values.tolist()
         Threshold = Threshold[0].split("/",1)
         number_of_cases = Threshold[0]
@@ -40,6 +63,7 @@ def createHome(parent):
         print(per_person)
         Threshold_percent.append((int(Threshold[0])/int(Threshold[1]))*100)
         year = dates.keys()[0].year
+        values_per_day = dates
         idx = pd.date_range('01-01-' + str(year), '12-31-' + str(year))
         dates = dates.reindex(idx, fill_value=0)
 
@@ -82,14 +106,6 @@ def createHome(parent):
         plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
         global analyse_canvas
         #analyse_canvas = ac.createAnalyse(parent, values_per_week, Threshold_percent, percentages)
-
-    #def Load_threshold_csv(event):
-     #   global Treshold_csv
-      #  parent.filename = filedialog.askopenfilename(initialdir = "/",
-       #                                              title = "Select file",
-        #                                             filetypes = (("CSV files","*.csv"),
-         #                                            ("all files","*.*")))
-        #Treshold_csv = pd.read_csv(parent.filename)
 
     #colors
     canvas_bg_color="#fec5e5"

@@ -16,6 +16,7 @@ in_use='Data Presentation'
 root = tk.Tk()
 root.configure(background="#fff")
 root.geometry("1280x720")
+button_identities = []
 
 #hover event functions
 def on_enter(event):
@@ -25,13 +26,71 @@ def on_leave(event):
 
 #on click event
 def go_next(event):
-    global analyse_canvas
+    global outliers_canvas
     global in_use
     data_pre_canvas.pack_forget()
     in_use = 'Analysing Data'
-    analyse_canvas = ac.createAnalyse(root, hc.values_per_week, hc.Threshold_percent, hc.percentages)
-    analyse_canvas.pack(side="right", fill=BOTH, expand=1)
+    outliers_canvas = oc.createOutlier(root, hc.values_per_week, hc.Threshold_percent, hc.percentages)
+    outliers_canvas.pack(side="right", fill=BOTH, expand=1)
+    button_identities[1]['state'] = tk.NORMAL
+    def go_incubation(event):
+        global incubation_canvas
+        global in_use
+        outliers_canvas.pack_forget()
+        in_use = 'Incubation Periode'
+        incubation_canvas = ic.createIncubation(root, hc.values_per_day, hc.incubation_min, hc.incubation_max, hc.values_per_week, hc.Threshold_percent, hc.percentages)
+        incubation_canvas.pack(side="right", fill=BOTH, expand=1)
+        button_identities[2]['state'] = tk.NORMAL
+        def go_analyse(event):
+            global analyse_canvas
+            global in_use
+            incubation_canvas.pack_forget()
+            in_use = 'Analysing Data'
+            analyse_canvas = ac.createAnalyse(root, hc.values_per_week, hc.Threshold_percent, hc.percentages, oc.anomalies)
+            analyse_canvas.pack(side="right", fill=BOTH, expand=1)
+            button_identities[3]['state'] = tk.NORMAL
+            def go_classification(event):
+                global classification_vancas
+                global in_use
+                analyse_canvas.pack_forget()
+                in_use = 'Classification'
+                classification_vancas = cc.createOutlier(root, hc.Sexe, hc.Age, hc.Secteur, hc.Quartier, hc.Commune)
+                classification_vancas.pack(side="right", fill=BOTH, expand=1)
+                button_identities[4]['state'] = tk.NORMAL
+            next_analyse = tk.Button(analyse_canvas,
+                    text="Next Step",
+                    width=15,
+                    height=2,
+                    bg=menu_color,
+                    fg='white',
+                    highlightthickness=0,
+                    relief='flat',
+                    font=("Helvetica", 12))
+            next_analyse.place(relx=0.85, rely=0.9)
+            next_analyse.bind('<ButtonRelease-1>', go_classification)
 
+        next_home = tk.Button(incubation_canvas,
+                    text="Next Step",
+                    width=15,
+                    height=2,
+                    bg=menu_color,
+                    fg='white',
+                    highlightthickness=0,
+                    relief='flat',
+                    font=("Helvetica", 12))
+        next_home.place(relx=0.85, rely=0.9)
+        next_home.bind('<ButtonRelease-1>', go_analyse)
+    next_incubation = tk.Button(outliers_canvas,
+                    text="Next Step",
+                    width=15,
+                    height=2,
+                    bg=menu_color,
+                    fg='white',
+                    highlightthickness=0,
+                    relief='flat',
+                    font=("Helvetica", 12))
+    next_incubation.place(relx=0.85, rely=0.9)
+    next_incubation.bind('<ButtonRelease-1>', go_incubation)
 def switch_canvas(button):
     global in_use
     print(in_use)
@@ -66,11 +125,7 @@ SideMenu.pack(side="left", fill=Y)
 #main window canvas
 in_use='Data Presentation'
 data_pre_canvas = hc.createHome(root)
-outliers_canvas = oc.createOutlier(root)
-incubation_canvas = ic.createOutlier(root)
 print(hc.values_per_week)
-#analyse_canvas = hc.createAnalyse()
-classification_vancas = cc.createOutlier(root)
 
 next_home = tk.Button(data_pre_canvas,
                  text="Next Step",
@@ -86,7 +141,7 @@ next_home.bind('<ButtonRelease-1>', go_next)
 
 #side menu items
 
-Labels=["Data Presentation", "Outliers Detection", "Incubation Periode", "Analysing Data", "Classification"]
+Labels=["Data Presentation", "Outliers Detection", "Exposer Periode", "Analysing Data", "Classification"]
 
 for i in range(5):
     side_label = tk.Button(SideMenu,
@@ -102,5 +157,10 @@ for i in range(5):
     side_label.place(x = 1, y = 70 + (i+1)*70, width=250, height=60)
     side_label.bind("<Enter>", on_enter)
     side_label.bind("<Leave>", on_leave)
+    # add the button's identity to a list:
+    button_identities.append(side_label)
+
+for i in range(1,5):
+    button_identities[i]['state'] = tk.DISABLED
 
 root.mainloop()

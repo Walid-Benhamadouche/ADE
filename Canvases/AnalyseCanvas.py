@@ -9,32 +9,12 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 
-def createAnalyse(parent, data, Threshold_percent, percentages):
+def createAnalyse(parent, data, Threshold_percent, percentages, anomalies):
 
-    def find_anomalies(data):
-        anomalies = []
-        random_data_std = np.std(data)
-        random_data_mean = np.mean(data)
-        anomaly_cut_off = random_data_std * 3
-
-        lower_limit = 0
-        upper_limit = random_data_mean + anomaly_cut_off
-
-        print(upper_limit)
-        print(lower_limit)
-        index = 0
-        for idx,outlier in enumerate(data):
-            if outlier > upper_limit or outlier < lower_limit:
-                anomalies.append(idx)
-            index +=1
-        print(data)
-        return anomalies
-    
-    def Analyse_data(data, figu, plot, fig):
+    def Analyse_data(data, figu, plot, fig, anomalies):
         data_without_anomalies = []
         data_to_classify = []
         final_classes = []
-        anomalies = find_anomalies(data)
         print(anomalies)
         under_over = []
         print(percentages)
@@ -77,7 +57,7 @@ def createAnalyse(parent, data, Threshold_percent, percentages):
         plot.draw()
         plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
     
-
+    canvas_bg_color="#fec5e5"
     Analyse = tk.Canvas(parent,
               width=1050,
               height=800,
@@ -104,6 +84,18 @@ def createAnalyse(parent, data, Threshold_percent, percentages):
     plot.draw()
     plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
 
+    #adding the title lable
+    Title = tk.Label(Analyse,
+                 text="Analysing Data :",
+                 width=15,
+                 height=2,
+                 bg=canvas_bg_color,
+                 fg='black',
+                 highlightthickness=0,
+                 relief='flat',
+                 font=("Helvetica", 12))
+    Title.place(x = 20, y = 10)
+
     Load_db = tk.Button(Analyse,
                  text="Analyse",
                  width=15,
@@ -114,5 +106,5 @@ def createAnalyse(parent, data, Threshold_percent, percentages):
                  relief='flat',
                  font=("Helvetica", 12))
     Load_db.place(relx=0.5, y = 70, anchor=tk.CENTER)
-    Load_db.configure(command=lambda b=data, f=figu, p=plot, fi=fig: Analyse_data(b, f, p, fi))
+    Load_db.configure(command=lambda b=data, f=figu, p=plot, fi=fig, ano=anomalies: Analyse_data(b, f, p, fi, ano))
     return Analyse
