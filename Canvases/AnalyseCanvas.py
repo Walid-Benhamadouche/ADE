@@ -2,6 +2,8 @@ from sklearn.neighbors import KNeighborsClassifier
 import tkinter as tk
 import numpy as np
 
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
@@ -9,7 +11,7 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 
-def createAnalyse(parent, data, Threshold_percent, percentages, anomalies):
+def createAnalyse(parent, data, Threshold_percent, percentages, anomalies, year_dates):
 
     def Analyse_data(data, figu, plot, fig, anomalies):
         data_without_anomalies = []
@@ -48,27 +50,78 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies):
                 final_classes.append(y_pred[thirdindex])
                 thirdindex +=1
         print(final_classes, len(final_classes))
+
+        starting_date = []
+        ending_date = []
+        over_counter = 0
+        start_date_temp = 0
+
         for idx,element in enumerate(final_classes):
             if (element == 'over'):
+                if (over_counter <1):
+                    start_date_temp = idx+1
+                over_counter+=1
                 figu.get_children()[idx].set_color('r')
+            else:
+                if (over_counter >= 2):
+                    starting_date.append(start_date_temp)
+                    ending_date.append(idx+1)
+                over_counter = 0
+        print(starting_date,ending_date)
+        spans = []
+        for idx,element in enumerate(starting_date):
+            temp = figu.axvspan(starting_date[idx], ending_date[idx]-0.1, color='green', alpha=0.4)
+            spans.append(temp)
         
+        annot = figu.annotate("", xy=(0,0), xytext=(-20,20),textcoords="offset points",
+                    bbox=dict(fc="white", ec="black", lw=1))
+
+        def init_annot(start_week, end_week):
+            annot.xy = (start_week, 0)
+            start_week = start_week*7
+            end_week = end_week * 7
+            annot.set_text("start date :"+str(year_dates.keys()[start_week])+"\nend date :"+str(year_dates.keys()[end_week-1]))
+            annot.set_visible(False)
+
+        def hover(event):
+            vis = annot.get_visible()
+            if event.inaxes == figu:
+                for index,span in enumerate(spans):
+                    cont, ind = span.contains(event)
+                    if cont:
+                        init_annot(starting_date[index], ending_date[index])
+                        annot.set_visible(True)
+                        fig.canvas.draw_idle()
+                        return
+            if vis:
+                annot.set_visible(False)
+                fig.canvas.draw_idle()
+        
+        legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4', label='Cases'),
+                           Patch(facecolor='r', edgecolor='r', label='weeks passed the threshold'),
+                           Patch(facecolor='green', edgecolor='green', alpha=0.4, label='Epidemie Period')]
+        figu.legend(handles=legend_elements)
+
         plot.get_tk_widget().forget()
         plot = FigureCanvasTkAgg(fig, master=Analyse)
         plot.draw()
         plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
+
+        fig.canvas.mpl_connect("motion_notify_event", hover)
     
-    canvas_bg_color="#fec5e5"
+    canvas_bg_color="#f5f5f5"
     Analyse = tk.Canvas(parent,
               width=1050,
               height=800,
-              bg='#101001',
+              bg='#f5f5f5',
               highlightthickness=0,
               relief='flat')
 
     x = np.linspace(1, len(data), len(data))
 
     fig = Figure()
-    fig.patch.set_facecolor('#fec5e5')
+    fig.patch.set_facecolor('#f5f5f5')
     
     figu = fig.add_subplot()
 
@@ -76,9 +129,13 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies):
 
     figu.yaxis.set_major_formatter(mtick.PercentFormatter(1))
     figu.set_title('number of cases per week')
-    figu.set_facecolor('#fec5e5')
-    figu.plot(x, [Threshold_percent for i in range(53)], label='treshold')
-    figu.legend()
+    figu.set_facecolor('#f5f5f5')
+    figu.plot(x, [Threshold_percent for i in range(53)], label='threshold')
+    
+    legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4',
+                                    label='Cases')]
+    figu.legend(handles=legend_elements)
 
     plot = FigureCanvasTkAgg(fig, master=Analyse)
     plot.draw()
@@ -100,7 +157,7 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies):
                  text="Analyse",
                  width=15,
                  height=2,
-                 bg='#3258EF',
+                 bg='#30e3ca',
                  fg='white',
                  highlightthickness=0,
                  relief='flat',

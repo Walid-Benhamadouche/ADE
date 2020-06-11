@@ -9,7 +9,7 @@ import Canvases.IncubationCanvas as ic
 import Canvases.ClassificationCanvas as cc
 
 #colors
-menu_color="#3258EF"
+menu_color="#30e3ca"
 in_use='Data Presentation'
 
 #main window
@@ -37,7 +37,7 @@ def go_next(event):
         global incubation_canvas
         global in_use
         outliers_canvas.pack_forget()
-        in_use = 'Incubation Periode'
+        in_use = 'Exposer Periode'
         incubation_canvas = ic.createIncubation(root, hc.values_per_day, hc.incubation_min, hc.incubation_max, hc.values_per_week, hc.Threshold_percent, hc.percentages)
         incubation_canvas.pack(side="right", fill=BOTH, expand=1)
         button_identities[2]['state'] = tk.NORMAL
@@ -46,7 +46,7 @@ def go_next(event):
             global in_use
             incubation_canvas.pack_forget()
             in_use = 'Analysing Data'
-            analyse_canvas = ac.createAnalyse(root, hc.values_per_week, hc.Threshold_percent, hc.percentages, oc.anomalies)
+            analyse_canvas = ac.createAnalyse(root, hc.values_per_week, hc.Threshold_percent, hc.percentages, oc.anomalies, hc.dates)
             analyse_canvas.pack(side="right", fill=BOTH, expand=1)
             button_identities[3]['state'] = tk.NORMAL
             def go_classification(event):
@@ -97,7 +97,7 @@ def switch_canvas(button):
     switcher = {
         'Data Presentation': lambda : root.configure(data_pre_canvas.pack_forget()),
         'Outliers Detection': lambda : root.configure(outliers_canvas.pack_forget()),
-        'Incubation Periode': lambda : root.configure(incubation_canvas.pack_forget()),
+        'Exposer Periode': lambda : root.configure(incubation_canvas.pack_forget()),
         'Analysing Data': lambda : root.configure(analyse_canvas.pack_forget()),
         'Classification': lambda : root.configure(classification_vancas.pack_forget())
     }
@@ -106,7 +106,7 @@ def switch_canvas(button):
     switcher = {
         'Data Presentation': lambda : root.configure(data_pre_canvas.pack(side="right", fill=BOTH, expand=1)),
         'Outliers Detection': lambda : root.configure(outliers_canvas.pack(side="right", fill=BOTH, expand=1)),
-        'Incubation Periode': lambda : root.configure(incubation_canvas.pack(side="right", fill=BOTH, expand=1)),
+        'Exposer Periode': lambda : root.configure(incubation_canvas.pack(side="right", fill=BOTH, expand=1)),
         'Analysing Data': lambda : root.configure(analyse_canvas.pack(side="right", fill=BOTH, expand=1)),
         'Classification': lambda : root.configure(classification_vancas.pack(side="right", fill=BOTH, expand=1))
     }
@@ -149,7 +149,7 @@ for i in range(5):
                     width=30,
                     height=5,
                     bg=menu_color,
-                    fg='white',
+                    fg='#000000',
                     highlightthickness=0,
                     relief='flat',
                     font=("Helvetica", 16))

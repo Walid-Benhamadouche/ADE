@@ -1,5 +1,8 @@
 import tkinter as tk
 import numpy as np
+
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
@@ -34,13 +37,19 @@ def createOutlier(parent, data, Threshold_percent, percentages):
         anomalies = find_anomalies(data)
         for elemnt in anomalies:
             figu.get_children()[elemnt].set_color('r')
-            plot.get_tk_widget().forget()
-            plot = FigureCanvasTkAgg(fig, master=outlier)
-            plot.draw()
-            plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)    
+
+        legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4',label='Cases'),
+                           Patch(facecolor='r', edgecolor='r',label='Outliers')]
+        figu.legend(handles=legend_elements)
+
+        plot.get_tk_widget().forget()
+        plot = FigureCanvasTkAgg(fig, master=outlier)
+        plot.draw()
+        plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)    
     
     #button_bg_color="#3258EF"
-    canvas_bg_color='#fec5e5'
+    canvas_bg_color='#f5f5f5'
     #button_bg_color="#3258EF"
     outlier = tk.Canvas(parent,
               width=1050,
@@ -51,16 +60,20 @@ def createOutlier(parent, data, Threshold_percent, percentages):
 
     x = np.linspace(1, len(data), len(data))
     fig = Figure()
-    fig.patch.set_facecolor('#fec5e5')
+    fig.patch.set_facecolor('#f5f5f5')
      
     figu = fig.add_subplot()
     figu.bar(x, percentages)
 
     figu.yaxis.set_major_formatter(mtick.PercentFormatter(1))
     figu.set_title('number of cases per week')
-    figu.set_facecolor('#fec5e5')
-    figu.plot(x, [Threshold_percent for i in range(53)], label='treshold')
-    figu.legend()
+    figu.set_facecolor('#f5f5f5')
+    figu.plot(x, [Threshold_percent for i in range(53)], label='threshold')
+    
+    legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4',
+                                    label='Cases')]
+    figu.legend(handles=legend_elements)
 
     plot = FigureCanvasTkAgg(fig, master=outlier)
     plot.draw()
@@ -81,7 +94,7 @@ def createOutlier(parent, data, Threshold_percent, percentages):
                  text="Outlier",
                  width=15,
                  height=2,
-                 bg='#3258EF',
+                 bg='#30e3ca',
                  fg='white',
                  highlightthickness=0,
                  relief='flat',

@@ -25,14 +25,11 @@ def createOutlier(parent, Sexe, Age, Secteur, Quartier, Commune):
     age_table = []
     age_table = temp_age[0]
     print(age_table)
-    #print(Sexe.values[0])
     for val in enumerate(temp_age):
         if not(val[0] in age_table):
             age_table.append(val[0])
 
-    print(age_table)
-
-    Age = Age.groupeby(['age']).size()
+    Age = Age.groupby(['age']).size()
     #re:grouping ages samples
     
     #for val in enumerate(age_table):

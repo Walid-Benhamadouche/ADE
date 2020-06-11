@@ -6,6 +6,8 @@ from tkinter import filedialog
 import tkinter as tk
 from calendar import monthrange
 
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
@@ -14,6 +16,7 @@ from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 #import Canvases.AnalyseCanvas as ac
 
+dates = []
 Sexe = []
 Age = []
 Secteur = []
@@ -40,6 +43,7 @@ def createHome(parent):
         global values_per_day
         global incubation_min
         global incubation_max
+        global dates
         parent.filename = filedialog.askopenfilename(initialdir = "/",
                                                      title = "Select file",
                                                      filetypes = (("CSV files","*.csv"),
@@ -85,7 +89,7 @@ def createHome(parent):
         x = np.linspace(1, len(values_per_week), len(values_per_week))
 
         fig = Figure()
-        fig.patch.set_facecolor('#fec5e5')
+        fig.patch.set_facecolor('#f5f5f5')
         
         #thresholdlist = [Threshold.iloc[0].values for i in range(53)]
         #print(thresholdlist)
@@ -96,9 +100,13 @@ def createHome(parent):
         #to display as %
         figu.yaxis.set_major_formatter(mtick.PercentFormatter(1))
         figu.set_title('number of cases per week')
-        figu.set_facecolor('#fec5e5')
-        figu.plot(x, [Threshold_percent for i in range(53)], label='treshold')
-        figu.legend()
+        figu.set_facecolor('#f5f5f5')
+        figu.plot(x, [Threshold_percent for i in range(53)], label='threshold')
+
+        legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4',
+                                    label='Cases')]
+        figu.legend(handles=legend_elements)
 
         plot.get_tk_widget().forget()
         plot = FigureCanvasTkAgg(fig, master=home)
@@ -108,8 +116,8 @@ def createHome(parent):
         #analyse_canvas = ac.createAnalyse(parent, values_per_week, Threshold_percent, percentages)
 
     #colors
-    canvas_bg_color="#fec5e5"
-    button_bg_color="#3258EF"
+    canvas_bg_color="#f5f5f5"
+    button_bg_color="#30e3ca"
     #variables that needs declaration
     global values_per_week
     global Threshold_percent
@@ -130,13 +138,12 @@ def createHome(parent):
 
     #adding plot
     fig = Figure()
-    fig.patch.set_facecolor('#fec5e5')
+    fig.patch.set_facecolor('#f5f5f5')
 
     figu = fig.add_subplot()
-    #figu.stem([0], [0], use_line_collection=True)
     figu.bar([0], [0])
     figu.set_title('number of cases per week')
-    figu.set_facecolor('#fec5e5')
+    figu.set_facecolor('#f5f5f5')
 
     plot = FigureCanvasTkAgg(fig, master=home)  # A tk.DrawingArea.
     plot.draw()
@@ -159,7 +166,7 @@ def createHome(parent):
                  width=15,
                  height=2,
                  bg=button_bg_color,
-                 fg='white',
+                 fg='#000000',
                  highlightthickness=0,
                  relief='flat',
                  font=("Helvetica", 12))

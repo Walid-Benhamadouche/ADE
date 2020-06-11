@@ -2,6 +2,8 @@ import tkinter as tk
 import datetime
 import numpy as np
 
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
@@ -37,14 +39,41 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
         start = start/7
         end = end/7
 
-        figu.axvspan(start, end, color='red', alpha=0.5)
+        test = figu.axvspan(start, end, color='red', alpha=0.5)
+
+        #position must be fixed
+        annot = figu.annotate("", xy=(start,0), xytext=(-20,20),textcoords="offset points",
+                    bbox=dict(fc="white", ec="black", lw=1))
+
+        annot.set_text("start date :"+str(exposer_period_start)+"\nend date :"+str(exposer_period_end)+"\nduration :"+str(exposer_time))
+        annot.set_visible(False)
+
+        def hover(event):
+            vis = annot.get_visible()
+            if event.inaxes == figu:
+                cont, ind = test.contains(event)
+                print(cont, ind)
+                if cont:
+                    annot.set_visible(True)
+                    fig.canvas.draw_idle()
+                    return
+            if vis:
+                annot.set_visible(False)
+                fig.canvas.draw_idle()
+
+        legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4', label='Cases'),
+                           Patch(facecolor='r', edgecolor='r', alpha=0.5, label='Exposer Periode')]
+        figu.legend(handles=legend_elements)
 
         plot.get_tk_widget().forget()
         plot = FigureCanvasTkAgg(fig, master=outlier)
         plot.draw()
         plot.get_tk_widget().place(relx=0.005, rely=0.15, relwidth=0.990, relheight=0.7)
+        
+        fig.canvas.mpl_connect("motion_notify_event", hover)
 
-    canvas_bg_color="#0C3851"
+    canvas_bg_color="#f5f5f5"
     #button_bg_color="#3258EF"
     outlier = tk.Canvas(parent,
               width=1050,
@@ -56,7 +85,7 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
     x = np.linspace(1, len(data), len(data))
 
     fig = Figure()
-    fig.patch.set_facecolor('#fec5e5')
+    fig.patch.set_facecolor('#f5f5f5')
     
     figu = fig.add_subplot()
 
@@ -64,9 +93,13 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
 
     figu.yaxis.set_major_formatter(mtick.PercentFormatter(1))
     figu.set_title('number of cases per week')
-    figu.set_facecolor('#fec5e5')
-    figu.plot(x, [Threshold_percent for i in range(53)], label='treshold')
-    figu.legend()
+    figu.set_facecolor('#f5f5f5')
+    figu.plot(x, [Threshold_percent for i in range(53)], label='threshold')
+    
+    legend_elements = [Line2D([0], [0], color='#1f77b4', lw=2, label='threshold'),
+                           Patch(facecolor='#1f77b4', edgecolor='#1f77b4',
+                                    label='Cases')]
+    figu.legend(handles=legend_elements)
 
     plot = FigureCanvasTkAgg(fig, master=outlier)
     plot.draw()
@@ -88,7 +121,7 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
                  text="find Exposer period",
                  width=15,
                  height=2,
-                 bg='#3258EF',
+                 bg='#30e3ca',
                  fg='white',
                  highlightthickness=0,
                  relief='flat',
