@@ -17,12 +17,9 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies, year_
         data_without_anomalies = []
         data_to_classify = []
         final_classes = []
-        print(anomalies)
         under_over = []
-        print(percentages)
         for idx,dataa in enumerate(percentages):
             if not (idx in anomalies):
-                print(dataa, Threshold_percent[0])
                 if (dataa > Threshold_percent[0]):
                     under_over.append("over")
                 else:
@@ -32,13 +29,9 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies, year_
                 data_without_anomalies.append(idx)
             else:
                 data_to_classify.append(idx)
-        print(under_over, len(under_over))
-        print(data_without_anomalies)
-        print(data_to_classify)
         knn = KNeighborsClassifier(n_neighbors=2, metric='minkowski', p=2)
         knn.fit(np.array(data_without_anomalies).reshape(-1, 1),np.array(under_over))
         y_pred = knn.predict(np.array(data_to_classify).reshape(-1, 1))
-        print(y_pred)
         index = 0
         secindex = 0
         thirdindex = 0
@@ -49,7 +42,6 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies, year_
             elif (index == data_to_classify[thirdindex]):
                 final_classes.append(y_pred[thirdindex])
                 thirdindex +=1
-        print(final_classes, len(final_classes))
 
         starting_date = []
         ending_date = []
@@ -67,7 +59,6 @@ def createAnalyse(parent, data, Threshold_percent, percentages, anomalies, year_
                     starting_date.append(start_date_temp)
                     ending_date.append(idx+1)
                 over_counter = 0
-        print(starting_date,ending_date)
         spans = []
         for idx,element in enumerate(starting_date):
             temp = figu.axvspan(starting_date[idx], ending_date[idx]-0.1, color='green', alpha=0.4)

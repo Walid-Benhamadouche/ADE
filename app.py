@@ -38,7 +38,7 @@ def go_next(event):
         global in_use
         outliers_canvas.pack_forget()
         in_use = 'Exposer Periode'
-        incubation_canvas = ic.createIncubation(root, hc.values_per_day, hc.incubation_min, hc.incubation_max, hc.values_per_week, hc.Threshold_percent, hc.percentages)
+        incubation_canvas = ic.createIncubation(root, hc.dates, hc.values_per_day, hc.incubation_min, hc.incubation_max, hc.incubation_aver, hc.values_per_week, hc.Threshold_percent, hc.percentages)
         incubation_canvas.pack(side="right", fill=BOTH, expand=1)
         button_identities[2]['state'] = tk.NORMAL
         def go_analyse(event):
@@ -93,7 +93,6 @@ def go_next(event):
     next_incubation.bind('<ButtonRelease-1>', go_incubation)
 def switch_canvas(button):
     global in_use
-    print(in_use)
     switcher = {
         'Data Presentation': lambda : root.configure(data_pre_canvas.pack_forget()),
         'Outliers Detection': lambda : root.configure(outliers_canvas.pack_forget()),
@@ -125,7 +124,6 @@ SideMenu.pack(side="left", fill=Y)
 #main window canvas
 in_use='Data Presentation'
 data_pre_canvas = hc.createHome(root)
-print(hc.values_per_week)
 
 next_home = tk.Button(data_pre_canvas,
                  text="Next Step",

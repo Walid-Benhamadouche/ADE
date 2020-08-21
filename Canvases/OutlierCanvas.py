@@ -22,14 +22,11 @@ def createOutlier(parent, data, Threshold_percent, percentages):
         lower_limit = 0
         upper_limit = random_data_mean + anomaly_cut_off
 
-        print(upper_limit)
-        print(lower_limit)
         index = 0
         for idx,outlier in enumerate(data):
             if outlier > upper_limit or outlier < lower_limit:
                 anomalies.append(idx)
             index +=1
-        print(data)
         return anomalies
     
     def Affiche (data, figu,plot,fig):

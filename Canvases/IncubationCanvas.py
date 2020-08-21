@@ -11,17 +11,19 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 
-def createIncubation(parent, values_per_day, incubation_min, incubation_max, data, Threshold_percent, percentages):
+def createIncubation(parent, dates, values_per_day, incubation_min, incubation_max, incubation_aver, data, Threshold_percent, percentages):
     
-    def find_exposer(values_per_day, incubation_min, incubation_max, plot, fig, figu):
-        print(values_per_day)
+    def find_exposer(dates, data, values_per_day, incubation_min, incubation_max, incubation_aver, plot, fig, figu):
         first_case = values_per_day.keys()[0]
         last_case = values_per_day.keys()[len(values_per_day)-1]
+        peak_case = data.index(max(data))
+        peak_case = (peak_case*7)+1
+        peak_case = dates.keys()[peak_case]
+
         incubation_min = incubation_min.iloc[0]['incubation_min']
         incubation_max = incubation_max.iloc[0]['incubation_max']
-        print(first_case)
-        print(last_case)
-        print(incubation_max)
+        incubation_aver = incubation_aver.iloc[0]['incubation_aver']
+
         first_case_date  = datetime.date(int(first_case.year), int(first_case.month), int(first_case.day))
         incubation_min_dt = datetime. timedelta(incubation_min)
         exposer_period_start = first_case_date - incubation_min_dt
@@ -32,10 +34,18 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
         exposer_period_end = last_case_date - incubation_max_dt
         print(exposer_period_end)
 
-        exposer_time = exposer_period_end - exposer_period_start
+        peak_case_date = datetime.date(int(peak_case.year), int(peak_case.month), int(peak_case.day))
+        incubation_aver_dt = datetime. timedelta(incubation_aver)
+        exposer_period_aver = peak_case_date - incubation_aver_dt
+        print(exposer_period_aver)
+
+        minn = min(exposer_period_start, exposer_period_aver, exposer_period_end)
+        maxx = max(exposer_period_start, exposer_period_aver, exposer_period_end)
+
+        exposer_time = maxx - minn
         print(exposer_time)
-        start = int(exposer_period_start.strftime("%j"))
-        end = int(exposer_period_end.strftime("%j"))
+        start = int(minn.strftime("%j"))
+        end = int(maxx.strftime("%j"))
         start = start/7
         end = end/7
 
@@ -45,7 +55,7 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
         annot = figu.annotate("", xy=(start,0), xytext=(-20,20),textcoords="offset points",
                     bbox=dict(fc="white", ec="black", lw=1))
 
-        annot.set_text("start date :"+str(exposer_period_start)+"\nend date :"+str(exposer_period_end)+"\nduration :"+str(exposer_time))
+        annot.set_text("start date :"+str(exposer_period_start)+"\naverage date :"+str(exposer_period_aver)+"\nend date :"+str(exposer_period_end)+"\nduration :"+str(exposer_time))
         annot.set_visible(False)
 
         def hover(event):
@@ -127,5 +137,5 @@ def createIncubation(parent, values_per_day, incubation_min, incubation_max, dat
                  relief='flat',
                  font=("Helvetica", 12))
     Exposer_per_bt.place(relx=0.5, y = 70, anchor=tk.CENTER)
-    Exposer_per_bt.configure(command=lambda v=values_per_day, min=incubation_min, max=incubation_max, p=plot, fi=fig, figu=figu: find_exposer(v, min, max, p, fi, figu))
+    Exposer_per_bt.configure(command=lambda dates=dates ,data=data, v=values_per_day, min=incubation_min, max=incubation_max, aver=incubation_aver, p=plot, fi=fig, figu=figu: find_exposer(dates, data, v, min, max, aver, p, fi, figu))
     return outlier

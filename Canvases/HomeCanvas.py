@@ -28,6 +28,7 @@ Threshold_percent = []
 percentages = []
 incubation_min=''
 incubation_max=''
+incubation_aver=''
 analyse_canvas=''
 fig=''
 def createHome(parent):
@@ -43,12 +44,13 @@ def createHome(parent):
         global values_per_day
         global incubation_min
         global incubation_max
+        global incubation_aver
         global dates
         parent.filename = filedialog.askopenfilename(initialdir = "/",
                                                      title = "Select file",
                                                      filetypes = (("CSV files","*.csv"),
                                                      ("all files","*.*")))
-        dateparse = lambda x: pd.datetime.strptime(x, '%d/%m/%Y')
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
         Data_base_csv = pd.read_csv(parent.filename,parse_dates=['date_DCL'],date_parser=dateparse)
         dates = Data_base_csv.groupby(['date_DCL']).size()
         Sexe = pd.read_csv(parent.filename,usecols = ["sexe"])
@@ -59,12 +61,12 @@ def createHome(parent):
         Threshold = pd.read_csv(parent.filename,usecols = ["threshold"])
         incubation_min = pd.read_csv(parent.filename,usecols = ["incubation_min"])
         incubation_max = pd.read_csv(parent.filename,usecols = ["incubation_max"])
+        incubation_aver = pd.read_csv(parent.filename,usecols = ["incubation_aver"])
         Threshold = Threshold.iloc[0].values.tolist()
         Threshold = Threshold[0].split("/",1)
         number_of_cases = Threshold[0]
         per_person = Threshold[1]
-        print(number_of_cases)
-        print(per_person)
+
         Threshold_percent.append((int(Threshold[0])/int(Threshold[1]))*100)
         year = dates.keys()[0].year
         values_per_day = dates
@@ -92,7 +94,6 @@ def createHome(parent):
         fig.patch.set_facecolor('#f5f5f5')
         
         #thresholdlist = [Threshold.iloc[0].values for i in range(53)]
-        #print(thresholdlist)
 
         figu = fig.add_subplot()
         #figu.stem(x,percentages, 'b', use_line_collection=True, markerfmt='bo', label='data')
@@ -125,8 +126,6 @@ def createHome(parent):
     Data_base_csv=''
     Treshold_csv=''
 
-    print(Data_base_csv)
-    print(Treshold_csv)
     #creating the canvas
     home = tk.Canvas(parent,
                      width=1050,
